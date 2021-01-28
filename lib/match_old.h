@@ -3,7 +3,6 @@
 
 #include <unordered_map>
 #include <cassert>
-#include <iostream>
 using namespace std;
 
 #include "vectors.h"
@@ -68,17 +67,12 @@ class ApproximateMatching {
             vec.insert(vec.end(), p.begin(), p.end());
             LCP lcp(vec);
 
-            int checked = 0;
             for(unsigned i = 0; i < counters.size(); i++) {
-                if(counters[i] + k >= sumCounted) {
-                    checked++;
-                    if(checkPosition(lcp, i, n)) {
-                        ans.push_back(i + start);
-                    }
+                if(counters[i] + k >= sumCounted && checkPosition(lcp, i, n)) {
+                    ans.push_back(i + start);
                 }
             }
-            cerr << "checked positions: " << checked << "\n";
-        } else {          
+        } else {
             for(unsigned i = 1; i < occ.size(); i++) {
                 if(frequent(i)) {
                     auto c1 = characteristic(vec, i), c2 = characteristic(p, i, true);
@@ -107,34 +101,17 @@ public:
             p.push_back(remap[x]);
         }
 
-        int m = p.size();
-        double logM = log2(m + 1), sqrtLogM = sqrt(logM), sqrtK = sqrt(k);
-        freqThreshold = ceil(2 * sqrtK * sqrtLogM);
+        freqThreshold = ceil(2 * sqrt(k));
         int c = remap.size();
         occ.resize(c + 1);
         for(unsigned i = 0; i < p.size(); i++) {
             occ[p[i]].push_back(i);
         }
-        int highestFreq = 0, frequentChars = 0;
         sumCounted = 0;
         for(const auto &o: occ) {
             sumCounted += min(freqThreshold, (int)o.size());
-            highestFreq = max(highestFreq, (int)o.size());
-            if((int)o.size() > freqThreshold) {
-                frequentChars++;
-            }
         }
-        // for asymptotic complexity, sumCounted >= 2 * k would be enough, but
-        // I'm trying to optimize it more
-        auto filterAndKangarooCost = ceil(logM) + freqThreshold 
-            + 1.0 * k * freqThreshold / (max(1, sumCounted - k));
-        auto FFTCost = freqThreshold + frequentChars * ceil(logM) * 50.0;
-        filterAndKangaroo = filterAndKangarooCost < FFTCost;
-        cerr << "mode = " << (filterAndKangaroo ? "filter and kangaroo jumps" : "FFT") << "\n";
-        cerr << "costs: " << filterAndKangarooCost << " " << FFTCost << "\n";
-        cerr << "most occurences: " << highestFreq << "\n";
-        cerr << "sumCounted: " << sumCounted << "\n";
-        cerr << "frequent characters: " << frequentChars << "\n";
+        filterAndKangaroo = sumCounted > 2 * k;
     }
 
     vector<int> match(const vector<T> &input) {

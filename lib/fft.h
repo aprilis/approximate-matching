@@ -6,7 +6,7 @@
 using namespace std;
 
 #define REP(i,n) for(int i = 0; i < int(n); ++i)
-typedef long double ld; // 'long double' is 2.2 times slower
+typedef double ld; // 'long double' is 2.2 times slower
 struct C { ld re, im;
 	C operator * (const C & he) const {
 		return C{re * he.re - im * he.im,

@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
         sigma = max(2, (int)sqrt(m)), cycle = max(2, (int)sqrt(m));
 
     mt19937 gen(seed);
-    uniform_int_distribution d(0, sigma - 1);
+    binomial_distribution d(sigma - 1, 0.5);
 
     vector<int> v(cycle);
     for(auto &x: v)
